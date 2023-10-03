@@ -1,0 +1,6 @@
+build/
+*.code-workspace
+include/softfp.h
+src/impl/
+src/config/
+test/
