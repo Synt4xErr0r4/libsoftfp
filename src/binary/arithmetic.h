@@ -26,6 +26,8 @@
 #include <stdio.h>
 #include "../misc/misc.h"
 
+#define NWORDS (sizeof z_F / sizeof *z_F)
+
 #define FARITHMETIC_BASIC_CHECK(x)\
     do {\
         switch(x##_C) {\
@@ -154,8 +156,6 @@ fsrc_t fmul(fsrc_t a, fsrc_t b) {
 
     z_E = x_E + y_E;
 
-#define NWORDS (sizeof z_F / sizeof *z_F)
-
     uint32_t prod[NWORDS * 2] = { 0 };
     uint32_t mult[NWORDS * 2] = { 0 };
     size_t shift = 0;
@@ -221,6 +221,22 @@ fsrc_t fdiv(fsrc_t a, fsrc_t b) {
 
     z_E = x_E - y_E;
 
+    uint32_t rem[NWORDS] = { 0 };
+    uint32_t quotient[NWORDS * 2] = { 0 };
+    uint32_t dividend[NWORDS * 2] = { 0 };
+
+    memcpy(&dividend[NWORDS], x_F, sizeof x_F);
+
+    divmnu((uint16_t *) quotient, (uint16_t *) rem, (uint16_t *) dividend, (uint16_t *) y_F, NWORDS * 4, BITS_TO_WORDS(2 * ARRAY_MSB(y_F)));
+
+    int round = ARRAY_RSHIFT(quotient, NWORDS * 32 - FFRAC);
+
+    if(!ARRAY_IS_ZERO(rem))
+        round |= BIT_STICKY;
+
+    memcpy(z_F, quotient, sizeof z_F);
+
+    FROUND_AND_NORMALIZE(z, round);
 done:
     FRETURN(z);
 }

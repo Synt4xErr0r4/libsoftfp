@@ -47,7 +47,7 @@
 int32_t __softfp_bitscan(uint32_t *arr, size_t n, bool reverse);
 
 #define ARRAY_LSHIFT(arr, shift) __softfp_arr_shift((arr), sizeof (arr) / sizeof(uint32_t), (shift))
-#define ARRAY_RSHIFT(arr, shift) __softfp_arr_shift((arr), sizeof (arr) / sizeof(uint32_t), -(shift))
+#define ARRAY_RSHIFT(arr, shift) __softfp_arr_shift((arr), sizeof (arr) / sizeof(uint32_t), -(int32_t) (shift))
 
 #define BIT_GUARD  (1 << 2)
 #define BIT_ROUND  (1 << 1)

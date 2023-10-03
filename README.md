@@ -21,7 +21,22 @@ x87's 80-bit extended precision format is also supported (here called `binary80`
 
 ## Building
 
-You can build the library using CMake:
+Before building the library, you need to configure it. Running
+
+```bash
+./configure.sh
+```
+
+will use the default configuration. You can use
+
+```bash
+./configure.sh --help
+```
+
+to show a list of all possible configuration options.
+This also generates the header file `include/softfp.h`
+
+Then you can build the library using CMake:
 
 ```bash
 mkdir build
@@ -125,6 +140,7 @@ whereas `cmul` and `cdiv` take the complex numbers themselves as their parameter
   - [ ] arithmetic
   - [ ] integer conversions
   - [ ] comparisons
+- [ ] edge cases tested
 
 ## License
 
