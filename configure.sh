@@ -415,6 +415,7 @@ while [[ $# -gt 0 ]]; do
         OPT_BIN80_SIZE="`mkopt "bin80-size=<${BL}80|${BL}96|${BL}128>"`"
         OPT_DEC_REPR="`mkopt "dec-repr=<${BL}both|${BL}bid|${BL}dpd>"`"
         OPT_NO_CMAKE="`mkopt no-cmake`"
+        OPT_NO_FENV="`mkopt no-fenv`"
         OPT_PRINT="`mkopt print`"
         OPT_HELP="`mkopt help`"
 
@@ -431,6 +432,7 @@ while [[ $# -gt 0 ]]; do
         prnt_opt $OPT_BIN80_SIZE
         prnt_opt $OPT_DEC_REPR ; echo
         prnt_opt $OPT_NO_CMAKE 
+        prnt_opt $OPT_NO_FENV
         prnt_opt $OPT_PRINT
         prnt_opt $OPT_HELP
 
@@ -469,6 +471,8 @@ while [[ $# -gt 0 ]]; do
         echo -e "$SPC '__bid_' or '__dpd_', respectively."
 
         echo -e " $OPT_NO_CMAKE$RS              Don't create a build dir and run cmake"
+        echo -e " $OPT_NO_FENV$RS               Don't use the standard floating-point environment"
+        echo -e "$SPC provided by $BL<fenv.h>$RS"
         echo -e " $OPT_PRINT$RS                 Print the selected config and exit"
         echo -e " $OPT_HELP$RS                  Print this help and exit"
 
@@ -647,7 +651,7 @@ sed $'/%functions%/{r functions.h\nd}' softfp.2.h > softfp.3.h
 if [[ $NO_FENV -eq 1 ]]; then
     sed $'/%fenv%/{r ../template/fenv.template.h\nd}' softfp.3.h > ../include/softfp.h
 else
-    sed -e 's/%fenv%/xxx/g' softfp.3.h > ../include/softfp.h
+    sed -e 's/%fenv%/#include <fenv.h>/g' softfp.3.h > ../include/softfp.h
 fi
 
 gen_isdpd() {

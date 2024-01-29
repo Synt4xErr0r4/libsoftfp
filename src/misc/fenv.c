@@ -3,21 +3,21 @@
 
 #ifdef SOFTFP_HAS_FENV
 
-# include <signal.h>
+#include <signal.h>
 
-# define EXCEPTION_OFFSET 0
-# define MASK_OFFSET      6
-# define ROUND_OFFSET     12
-# define HOLD_OFFSET      14
+#define EXCEPTION_OFFSET 0
+#define MASK_OFFSET 6
+#define ROUND_OFFSET 12
+#define HOLD_OFFSET 14
 
 const fenv_t dfl_env = 0;
 const fenv_t *const __softfp_dfl_env = &dfl_env;
 
 static void check_exceptions(fenv_t fenv) {
-    if(fenv & (1 << HOLD_OFFSET))
+    if (fenv & (1 << HOLD_OFFSET))
         return;
 
-    if((fenv >> EXCEPTION_OFFSET) & (fenv >> MASK_OFFSET) & FE_ALL_EXCEPT)
+    if ((fenv >> EXCEPTION_OFFSET) & (fenv >> MASK_OFFSET) & FE_ALL_EXCEPT)
         raise(SIGFPE);
 }
 
