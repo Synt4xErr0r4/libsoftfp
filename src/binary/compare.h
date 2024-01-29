@@ -23,34 +23,118 @@
 
 #pragma once
 
+#define CMP_NAN 2
+
+static inline int cmpimpl(fsrc_t a, fsrc_t b) {
+    FDECL(x);
+    FDECL(y);
+
+    FUNPACK(x, a);
+    FUNPACK(y, b);
+
+    if (x_C == FCLS_SNAN || y_C == FCLS_SNAN) {
+        feraiseexcept(FE_INVALID);
+        return CMP_NAN;
+    }
+
+    if (x_C == FCLS_QNAN || y_C == FCLS_QNAN)
+        return CMP_NAN;
+
+    if (x_C == FCLS_INF) {
+        if (y_C != FCLS_INF || x_S != y_S)
+            return x_S ? -1 : 1;
+
+        return 0;
+    }
+
+    if (y_C == FCLS_INF)
+        return y_S ? 1 : -1;
+
+    if (x_C == FCLS_ZERO)
+        return y_C == FCLS_ZERO ? 0 : y_S ? 1 : -1;
+
+    if (x_S > y_S)
+        return -1;
+
+    if (x_S < y_S)
+        return 1;
+
+    if (x_E > y_E)
+        return 1;
+
+    if (x_E < y_E)
+        return -1;
+
+    while (true) {
+        int msb_x = ARRAY_MSB(x_F);
+        int msb_y = ARRAY_MSB(y_F);
+
+        if (msb_x == msb_y) {
+            if (msb_x == -1)
+                return 0;
+
+            FCOMMON_SET_NTH(x, msb_x, 0);
+            FCOMMON_SET_NTH(y, msb_y, 0);
+            continue;
+        }
+
+        if (x_S)
+            return msb_x > msb_y ? -1 : 1;
+
+        return msb_x > msb_y ? 1 : -1;
+    }
+}
+
 int fcmp(fsrc_t a, fsrc_t b) {
-    return 0;
+    int cmp = cmpimpl(a, b);
+
+    if (cmp == CMP_NAN)
+        return 1;
+
+    return cmp;
 }
 
 int funord(fsrc_t a, fsrc_t b) {
-    return 0;
+    FDECL(x);
+    FDECL(y);
+
+    FUNPACK(x, a);
+    FUNPACK(y, b);
+
+    if (x_C == FCLS_SNAN || y_C == FCLS_SNAN) {
+        feraiseexcept(FE_INVALID);
+        return 1;
+    }
+
+    return x_C == FCLS_QNAN || y_C == FCLS_QNAN;
 }
 
 int feq(fsrc_t a, fsrc_t b) {
-    return 0;
+    int cmp = cmpimpl(a, b);
+    return cmp == CMP_NAN ? 1 : cmp;
 }
 
 int fne(fsrc_t a, fsrc_t b) {
-    return 0;
+    int cmp = cmpimpl(a, b);
+    return cmp == CMP_NAN ? 1 : cmp;
 }
 
 int fge(fsrc_t a, fsrc_t b) {
-    return 0;
+    int cmp = cmpimpl(a, b);
+    return cmp == CMP_NAN ? -1 : cmp;
 }
 
 int flt(fsrc_t a, fsrc_t b) {
-    return 0;
+    int cmp = cmpimpl(a, b);
+    return cmp == CMP_NAN ? 1 : cmp;
 }
 
 int fle(fsrc_t a, fsrc_t b) {
-    return 0;
+    int cmp = cmpimpl(a, b);
+    return cmp == CMP_NAN ? 1 : cmp;
 }
 
 int fgt(fsrc_t a, fsrc_t b) {
-    return 0;
+    int cmp = cmpimpl(a, b);
+    return cmp == CMP_NAN ? -1 : cmp;
 }

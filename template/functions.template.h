@@ -38,16 +38,16 @@ uint32_t %Pfixuns%Isi(%T a);
 uint64_t %Pfixuns%Idi(%T a);
 
 /** @brief converts `a` into a floating-point number */
-%T %Pfloat%Isi(int32_t a);
+%T %Pfloatsi%I(int32_t a);
 
 /** @brief converts `a` into a floating-point number */
-%T %Pfloat%Idi(int64_t a);
+%T %Pfloatdi%I(int64_t a);
 
 /** @brief converts `a` into a floating-point number */
-%T %Pfloatun%Isi(uint32_t a);
+%T %Pfloatunsi%I(uint32_t a);
 
 /** @brief converts `a` into a floating-point number */
-%T %Pfloatun%Idi(uint64_t a);
+%T %Pfloatundi%I(uint64_t a);
 
 /** @brief converts `a` into a bit-precise integer
  * converts `a` into a bit-precise integer, pointed

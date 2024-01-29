@@ -29,8 +29,8 @@
 #include <immintrin.h>
 #endif
 
-bool __softfp_mem_chk_zero(void *vp, size_t n) {
-    uint8_t *arr = (uint8_t *) vp;
+bool __softfp_mem_chk_zero(const void *vp, size_t n) {
+    const uint8_t *arr = (const uint8_t *) vp;
 
     while (n--)
         if (*arr++)
@@ -43,6 +43,7 @@ int32_t __softfp_bitscan(uint32_t *arr, size_t n, bool reverse) {
     if (reverse)
         for (size_t i = n; i > 0; --i) {
             size_t v = arr[i - 1];
+
             if (!v)
                 continue;
 
@@ -57,6 +58,7 @@ int32_t __softfp_bitscan(uint32_t *arr, size_t n, bool reverse) {
     else
         for (size_t i = 0; i < n; ++i) {
             size_t v = arr[i];
+
             if (!v)
                 continue;
 
@@ -68,6 +70,25 @@ int32_t __softfp_bitscan(uint32_t *arr, size_t n, bool reverse) {
                     return j + 32 * i;
 #endif
         }
+
+    return -1; // no bit found
+}
+
+int32_t __softfp_revbitscan(uint8_t *arr, size_t n) {
+    for (size_t i = n; i > 0; --i) {
+        size_t v = arr[i - 1];
+
+        if (!v)
+            continue;
+
+#ifdef X86 /* use `bsr` or `lzcnt` instruction */
+        return _bit_scan_reverse(v) + 8 * (i - 1);
+#else
+        for (size_t j = 8; j > 0; --j)
+            if (v & (1 << (j - 1)))
+                return j - 1 + 8 * (i - 1);
+#endif
+    }
 
     return -1; // no bit found
 }

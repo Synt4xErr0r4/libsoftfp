@@ -46,6 +46,9 @@ make
 make install # optional
 ```
 
+(Note that running `./configure.sh` automatically creates the `build` directory and runs `cmake ..` unless `--no-cmake`
+is specified)
+
 ## Usage
 
 For all the supported types, the following functions are provided:
@@ -74,7 +77,15 @@ For all the supported types, the following functions are provided:
 - `int __gtX2(T a, T b)` (returns `a > b`)
 - `int __geX2(T a, T b)` (returns `a >= b`)
 
-(All of these are practically analogous to [GCC's routines for floating point emulation](https://gcc.gnu.org/onlinedocs/gccint/Soft-float-library-routines.html). There you can also find the exact semantics of the comparison functions.)
+(All of these are practically analogous to
+[GCC's routines for floating point emulation](https://gcc.gnu.org/onlinedocs/gccint/Soft-float-library-routines.html)
+and [decimal floating point emulation](https://gcc.gnu.org/onlinedocs/gccint/Decimal-float-library-routines.html).
+There you can also find the exact semantics of the comparison functions.)
+
+Decimal floating-point types are available in two modes: DPD (densly packed decimal) and BID (binary integer decimal).
+When running `./configure.sh`, you can chose which one you want to use. If you, however, decide to include both modes,
+separate versions of the aforementioned functions are created for each mode. The functions then start with `__dpd_` or
+`__bid_` rather than `__` (e.g., `__dpd_addX3` for the DPD version of `__addX3` and `__bid_addX3` for the BID version).
 
 `T` is the floating-point type, `X` is its corresponding identifier:
 
@@ -88,7 +99,7 @@ For all the supported types, the following functions are provided:
 | binary256  | sfloat256_t   | yf |
 | decimal32  | sdecimal32_t  | sd |
 | decimal64  | sdecimal64_t  | dd |
-| decimal128 | sdecimal128_t | xd |
+| decimal128 | sdecimal128_t | td |
 
 There are also function for converting between types:
 
@@ -101,7 +112,7 @@ into a target type `T` (with identifier `Y`).
 `trunc` is used when `S` is more precise than `T`,
 as visualized in this table:
 
-|            | binary16 | binary32 | decimal32 | binary64 | decimal64 | binary80 | binary128 | decimal128 | binary256 |
+|            | binary16 | binary32 | decimal32 | binary64 | decimal64 | binary80 | binary128 | decimal128 | binary256  |
 | ---------- | -------- | -------- | --------- | -------- | --------- | -------- | --------- | ---------- | ---------- |
 | binary16   |          | extend   | extend    | extend   | extend    | extend   | extend    | extend     | extend     |
 | binary32   | trunc    |          | extend    | extend   | extend    | extend   | extend    | extend     | extend     |
@@ -133,13 +144,17 @@ whereas `cmul` and `cdiv` take the complex numbers themselves as their parameter
 
 - binary
   - [x] arithmetic (`add`, `sub`, `mul`, `div`, `neg`)
-  - [ ] integer conversions (`fix`, `float`)
-  - [ ] comparisons (`cmp`, `unord`, `eq`, ...)
+  - [x] integer conversions (`fix`, `float`)
+  - [x] comparisons (`cmp`, `unord`, `eq`, ...)
   - [ ] complex arithmetic (`mul`, `div`, `cmul`, `cdiv`)
 - decimal
   - [ ] arithmetic
   - [ ] integer conversions
   - [ ] comparisons
+- type conversion (`trunc`, `extend`)
+  - [ ] binary to binary
+  - [ ] decimal to decimal
+  - [ ] binary to decimal et vice versa
 - [ ] edge cases tested
 
 ## License

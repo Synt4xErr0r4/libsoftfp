@@ -44,7 +44,11 @@
 #define ARRAY_MSB(arr) __softfp_bitscan((arr), sizeof(arr) / sizeof *(arr), true)
 #define ARRAY_LSB(arr) __softfp_bitscan((arr), sizeof(arr) / sizeof *(arr), false)
 
+// forward/reverse bitscan (LSB/MSB) array of n words
 int32_t __softfp_bitscan(uint32_t *arr, size_t n, bool reverse);
+
+// reverse bitscan (MSB) array of n bytes
+int32_t __softfp_revbitscan(uint8_t *arr, size_t n);
 
 #define ARRAY_LSHIFT(arr, shift) __softfp_arr_shift((arr), sizeof(arr) / sizeof *(arr), (shift))
 #define ARRAY_RSHIFT(arr, shift) __softfp_arr_shift((arr), sizeof(arr) / sizeof *(arr), -(int32_t) (shift))
@@ -58,7 +62,7 @@ int __softfp_arr_shift(uint32_t *arr, size_t n, int32_t shift);
 #define MEM_IS_ZERO(mem, n) __softfp_mem_chk_zero((mem), (n))
 #define ARRAY_IS_ZERO(arr) MEM_IS_ZERO((arr), sizeof(arr))
 
-bool __softfp_mem_chk_zero(void *vp, size_t n);
+bool __softfp_mem_chk_zero(const void *vp, size_t n);
 
 #define SHOULD_ROUND(sign, round) __softfp_should_round((sign), (round))
 

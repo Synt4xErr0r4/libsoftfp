@@ -44,6 +44,7 @@
 
 #define FQNAN(x) FCOMMON_QNAN(x, FEXP, FFRAC)
 #define FINF(x) FCOMMON_INF(x, FEXP)
+#define FZERO(x) FCOMMON_ZERO(x, FEXP)
 
 #define FROUND_AND_NORMALIZE(x, round) FCOMMON_ROUND_AND_NORMALIZE(x, round, FEXP, FFRAC)
 

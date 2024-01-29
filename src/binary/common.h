@@ -183,10 +183,10 @@ static inline void __set_nth_bit(uint32_t *arr, uint32_t bit, bool val) {
         FCOMMON_SET_JBIT(z, (F), 1);                                                                                   \
     } while (0)
 
-#define FZERO(x)                                                                                                       \
+#define FCOMMON_ZERO(x, E)                                                                                             \
     do {                                                                                                               \
         memset(x##_F, 0, sizeof x##_F);                                                                                \
-        x##_E = 0;                                                                                                     \
+        x##_E = -FBIAS((E));                                                                                           \
     } while (0)
 
 #define FCOMMON_ROUND_AND_NORMALIZE(x, round_ctrl, E, F)                                                               \
