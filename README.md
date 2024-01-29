@@ -69,7 +69,7 @@ For all the supported types, the following functions are provided:
 - `T __floatunXdi(uint64_t a)` (returns `(sfloatN_t) a`)
 - `T __floatbitintX(void *r, int32_t rprec)` (returns `(sfloatN_t) a`, where `a` is a `_BitInt` with `rprec` bits)
 - `int __cmpX2(T a, T b)` (returns `a <=> b`)
-- `int __unordX2(T a, T b)` (returns `a <=> b`)
+- `int __unordX2(T a, T b)` (returns `isNaN(a) || isNaN(b)`)
 - `int __eqX2(T a, T b)` (returns `a == b`)
 - `int __neX2(T a, T b)` (returns `a != b`)
 - `int __ltX2(T a, T b)` (returns `a < b`)

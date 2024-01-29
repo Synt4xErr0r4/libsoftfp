@@ -36,6 +36,8 @@
 # define FID   %I
 # define FCID  %FC
 
+# define FSTDCOMPLEX %CX
+
 #else /* as target */
 # include "../binary/target_reset.h"
 # include "../decimal/target_reset.h"

@@ -655,12 +655,12 @@ else
 fi
 
 gen_isdpd() {
-    ([[ "$1" == "dpd" ]] || ([[ "$1" == "" ]] && [[ "$6" == "decimal" ]] && [[ $REPR_DEC == "dpd" ]])) && return 0
+    ([[ "$1" == "dpd" ]] || ([[ "$1" == "" ]] && [[ "$7" == "decimal" ]] && [[ $REPR_DEC == "dpd" ]])) && return 0
     return 1
 }
 
 gen_filename() {
-    if [[ "$6" != "decimal" ]]; then
+    if [[ "$7" != "decimal" ]]; then
         suffix=""
     else
         gen_isdpd $@
@@ -671,7 +671,7 @@ gen_filename() {
         fi
     fi
 
-    echo "$6$2$suffix"
+    echo "$7$2$suffix"
 }
 
 gen_truncextend_impls() {
@@ -680,17 +680,17 @@ gen_truncextend_impls() {
 
     bits=$1
     id=$3
-    kind=$5
-    shift 10
+    kind=$6
+    shift 11
 
     while [[ $# -gt 4 ]]; do    
         target_bits=$1
         target_mode=$2
         target_id=$3
-        target_kind=$5
+        target_kind=$6
 
         if [[ $target_mode -eq $MODE_NONE ]] || [[ "$id" == "$target_id" ]]; then
-            shift 10
+            shift 11
             continue
         fi
 
@@ -715,15 +715,15 @@ gen_truncextend_impls() {
             echo "#include \"../common.h\"" >> impl.h
         done
 
-        shift 10
+        shift 11
     done
 }
 
 gen_impls() {
     if [[ $2 -ne $MODE_NONE ]]; then
-        prnt_info "Generating implementations for $5$1..."
+        prnt_info "Generating implementations for $6$1..."
 
-        for prefix in `gen_decimal_prefix $5`; do
+        for prefix in `gen_decimal_prefix $6`; do
 
             # convert __X_ to X
             readable_prefix=${prefix%_}
@@ -734,15 +734,15 @@ gen_impls() {
             implfile=../src/impl/$filename.c
 
             touch config.h
-            cat ../template/config.$5.template.h > config.h
+            cat ../template/config.$6.template.h > config.h
 
             gen_isdpd "$readable_prefix" $@
             dpd=$((1-$?))
 
             process_template config.h\
-                B $1 M $2 I $3\
-                FE $6 FJ $7 FF $8 FC $4\
-                DC $9 DS ${10} DR "$dpd"
+                B $1 M $2 I $3 CX $5\
+                FE $7 FJ $8 FF $9 FC $4\
+                DC ${10} DS ${11} DR "$dpd"
 
             cp -f config.h $cfgfile
 
@@ -757,16 +757,24 @@ gen_impls() {
     fi
 }
 
-#           bits mode         id cid kind  exp J frac comb sig
-IMPL_BIN16="16   $MODE_BIN16  hf hc binary  5  0 10  _  _"
-IMPL_BIN32="32   $MODE_BIN32  sf sc binary  8  0 23  _  _"
-IMPL_BIN64="64   $MODE_BIN64  df dc binary  11 0 52  _  _"
-IMPL_BIN80="80   $MODE_BIN80  tf tc binary  15 1 63  _  _"
-IMPL_BIN128="128 $MODE_BIN128 xf xc binary  15 0 112 _  _"
-IMPL_BIN256="256 $MODE_BIN256 yf yc binary  19 0 236 _  _"
-IMPL_DEC32="32   $MODE_DEC32  sd _  decimal _  _ _   11 20"
-IMPL_DEC64="64   $MODE_DEC64  dd _  decimal _  _ _   13 50"
-IMPL_DEC128="128 $MODE_DEC128 td _  decimal _  _ _   17 110"
+stdcomplex() {
+    if [[ "$1" == "_Complex" ]]; then
+        echo "1"
+    else
+        echo "0"
+    fi
+}
+
+#           bits mode         id cid stdcomplex                 kind  exp J frac comb sig
+IMPL_BIN16="16   $MODE_BIN16  hf hc  `stdcomplex $CTYPE_BIN16`  binary  5  0 10  _  _"
+IMPL_BIN32="32   $MODE_BIN32  sf sc  `stdcomplex $CTYPE_BIN32`  binary  8  0 23  _  _"
+IMPL_BIN64="64   $MODE_BIN64  df dc  `stdcomplex $CTYPE_BIN64`  binary  11 0 52  _  _"
+IMPL_BIN80="80   $MODE_BIN80  tf tc  `stdcomplex $CTYPE_BIN80`  binary  15 1 63  _  _"
+IMPL_BIN128="128 $MODE_BIN128 xf xc  `stdcomplex $CTYPE_BIN128` binary  15 0 112 _  _"
+IMPL_BIN256="256 $MODE_BIN256 yf yc  `stdcomplex $CTYPE_BIN256` binary  19 0 236 _  _"
+IMPL_DEC32="32   $MODE_DEC32  sd _   0                          decimal _  _ _   11 20"
+IMPL_DEC64="64   $MODE_DEC64  dd _   0                          decimal _  _ _   13 50"
+IMPL_DEC128="128 $MODE_DEC128 td _   0                          decimal _  _ _   17 110"
 
 IMPL_ALL="$IMPL_BIN16 $IMPL_BIN32 $IMPL_BIN64 $IMPL_BIN80 $IMPL_BIN128 $IMPL_BIN256 $IMPL_DEC32 $IMPL_DEC64 $IMPL_DEC128"
 

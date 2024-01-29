@@ -156,6 +156,7 @@ static inline void __set_nth_bit(uint32_t *arr, uint32_t bit, bool val) {
         } else if ((J) && !FCOMMON_GET_JBIT(x, (F)))                                                                   \
             x##_C = FCLS_ILLEGAL;                                                                                      \
         else if (x##_E == FSPECIALEXP((E))) {                                                                          \
+            x##_E -= FBIAS((E));                                                                                       \
             if (__frac_zero)                                                                                           \
                 x##_C = FCLS_INF;                                                                                      \
             else if (FCOMMON_GET_QNAN(x, (F)))                                                                         \

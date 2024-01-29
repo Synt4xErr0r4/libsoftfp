@@ -129,9 +129,7 @@ uint64_t ffixu64(fsrc_t a) {
         z_E = msb;                                                                                                     \
                                                                                                                        \
     done:                                                                                                              \
-        fsrc_t r;                                                                                                      \
-        FPACK(z, r);                                                                                                   \
-        return r;                                                                                                      \
+        FRETURN(z);                                                                                                    \
     } while (0)
 
 #define CONV2FLOAT(unsigned_) BASE_CONV2FLOAT(unsigned_, sizeof a, a == 0, a < 0, a = -a, &a)
@@ -183,9 +181,7 @@ fsrc_t ffloatbit(const void *r, int32_t rprec) {
     if (!rprec) {
         FDECL(z);
         FZERO(z);
-        fsrc_t r;
-        FPACK(z, r);
-        return r;
+        FRETURN(z);
     }
 
     bool unsigned_ = rprec > 0;

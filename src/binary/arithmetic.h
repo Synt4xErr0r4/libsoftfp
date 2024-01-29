@@ -54,6 +54,18 @@ static inline uint32_t addcarry(uint32_t a, uint32_t b, uint8_t *carry) {
     return c;
 }
 
+static inline uint32_t subborrow(uint32_t a, uint32_t b, uint8_t *carry) {
+    uint32_t c;
+#ifdef X86
+    *carry = _subborrow_u32(*carry, a, b, &c);
+#else
+    c = a - b - *carry;
+
+    *carry = ((b == UINT32_MAX && *carry) || b + *carry > a) ? 1 : 0; // overflow check
+#endif
+    return c;
+}
+
 static inline fsrc_t faddsub(fsrc_t a, fsrc_t b, bool sub) {
     FDECL(x);
     FDECL(y);
@@ -81,8 +93,11 @@ static inline fsrc_t faddsub(fsrc_t a, fsrc_t b, bool sub) {
         goto done;
     }
 
+    printf("%d/%d x=%d, y=%d, %d\n", x_E, FSPECIALEXP(FEXP), x_C, y_C, FCLS_INF);
+
     if (x_C == FCLS_INF || y_C == FCLS_ZERO)
         FRETURN(x);
+
     if (y_C == FCLS_INF || x_C == FCLS_ZERO)
         FRETURN(y);
 
@@ -98,19 +113,19 @@ static inline fsrc_t faddsub(fsrc_t a, fsrc_t b, bool sub) {
 
         z_S = x_S;
     } else {
-        for (size_t i = 0; i < sizeof x_F / sizeof *x_F; ++i) {
-#ifdef X86
-            carry = _subborrow_u32(carry, x_F[i], y_F[i], &z_F[i]);
-#else
-            uint32_t a = x_F[i];
-            uint32_t b = y_F[i];
+        for (size_t i = 0; i < sizeof x_F / sizeof *x_F; ++i)
+            z_F[i] = subborrow(x_F[i], y_F[i], &carry);
 
-            z_F[i] = a - b - carry;
-            carry = ((b == UINT32_MAX && carry) || b + carry > a) ? 1 : 0; // overflow check
-#endif
-        }
+        if (carry) {
+            z_S = !x_S;
 
-        z_S = !!carry;
+            carry = 1;
+
+            // negate z_F (two's complement)
+            for (size_t i = 0; i < sizeof z_F / sizeof *z_F; ++i)
+                z_F[i] = ~subborrow(z_F[i], 0, &carry);
+        } else
+            z_S = x_S;
     }
 
     FROUND_AND_NORMALIZE(z, round);
