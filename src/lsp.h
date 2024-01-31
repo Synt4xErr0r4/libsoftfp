@@ -20,65 +20,72 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 #pragma once
 
-#include "../lsp.h"
-#include "common_source.h"
+/*
+ * since the macros FBITS, FEXP et al. are defined in the dynamically created config header files, the LSP does not
+ * know about them. Therefore, we define some dummy values here to make the LSP happy.
+ */
 
-int32_t ffixi32(fsrc_t a) {
-    (void) a;
-    return 0;
-}
+#ifdef __SOFTFP_LSP
 
-int64_t ffixi64(fsrc_t a) {
-    (void) a;
-    return 0;
-}
+#include <stdbool.h>
+#include <stdint.h>
 
-uint32_t ffixu32(fsrc_t a) {
-    (void) a;
-    return 0;
-}
+#if defined __x86_64__ || defined _M_X64 || defined i386 || defined __i386__ || defined __i386 || defined _M_IX86
+#include <immintrin.h>
+#endif
 
-uint64_t ffixu64(fsrc_t a) {
-    (void) a;
-    return 0;
-}
+#ifndef FDEFINED
 
-fsrc_t ffloati32(int32_t a) {
-    (void) a;
-    fsrc_t x = {0};
-    return x;
-}
+#define FDEC 0
+#define FCAST_ONLY 0
 
-fsrc_t ffloati64(int64_t a) {
-    (void) a;
-    fsrc_t x = {0};
-    return x;
-}
+#define FBITS 15
+#define FEXP 5
+#define FJBIT 0
+#define FFRAC 10
+#define FID _
+#define FCID _
 
-fsrc_t ffloatu32(uint32_t a) {
-    (void) a;
-    fsrc_t x = {0};
-    return x;
-}
+#define FSTDCOMPLEX 0
 
-fsrc_t ffloatu64(uint64_t a) {
-    (void) a;
-    fsrc_t x = {0};
-    return x;
-}
+#define FDPD 0
 
-void ffixbit(void *r, int32_t rprec, fsrc_t a) {
-    (void) r;
-    (void) rprec;
-    (void) a;
-}
+#define FBITS 15
+#define FCOMB 5
+#define FSIGN 10
+#define FID _
 
-fsrc_t ffloatbit(const void *r, int32_t rprec) {
-    (void) r;
-    (void) rprec;
-    fsrc_t x = {0};
-    return x;
-}
+#endif
+
+#ifndef TDEFINED
+
+#define TDEC 0
+
+#define TBITS 15
+#define TEXP 5
+#define TJBIT 0
+#define TFRAC 10
+#define TID _
+
+#define TDPD 0
+
+#define TBITS 15
+#define TCOMB 5
+#define TSIGN 10
+#define TID _
+
+#endif
+
+// dummy types
+typedef void *sbinary15_t;
+
+typedef struct {
+    void *Re;
+    void *Im;
+} scbinary15_t;
+
+typedef void *sdecimal15_t;
+
+#endif

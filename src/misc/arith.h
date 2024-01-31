@@ -23,62 +23,34 @@
 
 #pragma once
 
-#include "../lsp.h"
-#include "common_source.h"
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 
-int32_t ffixi32(fsrc_t a) {
-    (void) a;
-    return 0;
-}
+/**
+ * @param r[n] result
+ * @param a[n] first operand
+ * @param b[n] second operand
+ * @param n number of 32-bit words
+ */
+int __softfp_add(uint32_t r[], const uint32_t a[], const uint32_t b[], size_t n);
 
-int64_t ffixi64(fsrc_t a) {
-    (void) a;
-    return 0;
-}
+/**
+ * @param r[n] result
+ * @param a[n] first operand
+ * @param b[n] second operand
+ * @param n number of 32-bit words
+ */
+int __softfp_sub(uint32_t r[], const uint32_t a[], const uint32_t b[], size_t n);
 
-uint32_t ffixu32(fsrc_t a) {
-    (void) a;
-    return 0;
-}
+/**
+ * @param r[2*n] result
+ * @param a[2*n] first operand (n bytes of data padded with n bytes of zeros)
+ * @param b[n] second operand
+ * @param n number of 32-bit words
+ */
+int __softfp_mul(uint32_t r[], uint32_t a[], const uint32_t b[], size_t n);
 
-uint64_t ffixu64(fsrc_t a) {
-    (void) a;
-    return 0;
-}
-
-fsrc_t ffloati32(int32_t a) {
-    (void) a;
-    fsrc_t x = {0};
-    return x;
-}
-
-fsrc_t ffloati64(int64_t a) {
-    (void) a;
-    fsrc_t x = {0};
-    return x;
-}
-
-fsrc_t ffloatu32(uint32_t a) {
-    (void) a;
-    fsrc_t x = {0};
-    return x;
-}
-
-fsrc_t ffloatu64(uint64_t a) {
-    (void) a;
-    fsrc_t x = {0};
-    return x;
-}
-
-void ffixbit(void *r, int32_t rprec, fsrc_t a) {
-    (void) r;
-    (void) rprec;
-    (void) a;
-}
-
-fsrc_t ffloatbit(const void *r, int32_t rprec) {
-    (void) r;
-    (void) rprec;
-    fsrc_t x = {0};
-    return x;
+static inline int addsub(uint32_t r[], const uint32_t a[], const uint32_t b[], size_t n, bool sub) {
+    return (sub ? __softfp_sub : __softfp_add)(r, a, b, n);
 }

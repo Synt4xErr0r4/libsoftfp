@@ -23,62 +23,18 @@
 
 #pragma once
 
-#include "../lsp.h"
-#include "common_source.h"
+#include <stdint.h>
 
-int32_t ffixi32(fsrc_t a) {
-    (void) a;
-    return 0;
-}
+int __softfp_divmnu(uint16_t q[], uint16_t r[], const uint16_t u[], const uint16_t v[], int m, int n);
 
-int64_t ffixi64(fsrc_t a) {
-    (void) a;
-    return 0;
-}
-
-uint32_t ffixu32(fsrc_t a) {
-    (void) a;
-    return 0;
-}
-
-uint64_t ffixu64(fsrc_t a) {
-    (void) a;
-    return 0;
-}
-
-fsrc_t ffloati32(int32_t a) {
-    (void) a;
-    fsrc_t x = {0};
-    return x;
-}
-
-fsrc_t ffloati64(int64_t a) {
-    (void) a;
-    fsrc_t x = {0};
-    return x;
-}
-
-fsrc_t ffloatu32(uint32_t a) {
-    (void) a;
-    fsrc_t x = {0};
-    return x;
-}
-
-fsrc_t ffloatu64(uint64_t a) {
-    (void) a;
-    fsrc_t x = {0};
-    return x;
-}
-
-void ffixbit(void *r, int32_t rprec, fsrc_t a) {
-    (void) r;
-    (void) rprec;
-    (void) a;
-}
-
-fsrc_t ffloatbit(const void *r, int32_t rprec) {
-    (void) r;
-    (void) rprec;
-    fsrc_t x = {0};
-    return x;
+/**
+ * @param q[m-n+1] quotient
+ * @param r[n] remainder
+ * @param u[m] dividend
+ * @param v[n] divisor
+ * @param m number of 32-bit words in u
+ * @param n number of 32-bit words in v (m >= n)
+ */
+static inline int divmnu(uint32_t q[], uint32_t r[], const uint32_t u[], const uint32_t v[], int m, int n) {
+    return __softfp_divmnu((uint16_t *) q, (uint16_t *) r, (const uint16_t *) u, (const uint16_t *) v, m * 2, n * 2);
 }

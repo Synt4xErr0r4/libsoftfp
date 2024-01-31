@@ -23,27 +23,41 @@
 
 #pragma once
 
+#include "../lsp.h"
+#include "common_source.h"
+
+#include <stdio.h>
+
 fsrc_t fadd(fsrc_t a, fsrc_t b) {
-    fsrc_t x;
+    (void) a;
+    (void) b;
+    fsrc_t x = {0};
     return x;
 }
 
 fsrc_t fsub(fsrc_t a, fsrc_t b) {
-    fsrc_t x;
+    (void) a;
+    (void) b;
+    fsrc_t x = {0};
     return x;
 }
 
 fsrc_t fmul(fsrc_t a, fsrc_t b) {
-    fsrc_t x;
+    (void) a;
+    (void) b;
+    fsrc_t x = {0};
     return x;
 }
 
 fsrc_t fdiv(fsrc_t a, fsrc_t b) {
-    fsrc_t x;
+    (void) a;
+    (void) b;
+    fsrc_t x = {0};
     return x;
 }
 
-fsrc_t fneg(fsrc_t a, fsrc_t b) {
-    fsrc_t x;
+fsrc_t fneg(fsrc_t a) {
+    (void) a;
+    fsrc_t x = {0};
     return x;
 }

@@ -24,61 +24,17 @@
 #pragma once
 
 #include "../lsp.h"
-#include "common_source.h"
+#include "../misc/misc.h"
+#include "common.h"
 
-int32_t ffixi32(fsrc_t a) {
-    (void) a;
-    return 0;
-}
+void __softfp_dpd_unpack(bool *restrict sign, uint32_t significand[], int32_t *restrict exponent,
+                         dclass_t *restrict class, void *restrict data, size_t ncomb, size_t nsig);
 
-int64_t ffixi64(fsrc_t a) {
-    (void) a;
-    return 0;
-}
+void __softfp_bid_unpack(bool *restrict sign, uint32_t significand[], int32_t *restrict exponent,
+                         dclass_t *restrict class, void *restrict data, size_t ncomb, size_t nsig);
 
-uint32_t ffixu32(fsrc_t a) {
-    (void) a;
-    return 0;
-}
+void __softfp_dpd_pack(bool sign, uint32_t significand[], int32_t exponent, dclass_t class, void *restrict data,
+                       size_t ncomb, size_t nsig);
 
-uint64_t ffixu64(fsrc_t a) {
-    (void) a;
-    return 0;
-}
-
-fsrc_t ffloati32(int32_t a) {
-    (void) a;
-    fsrc_t x = {0};
-    return x;
-}
-
-fsrc_t ffloati64(int64_t a) {
-    (void) a;
-    fsrc_t x = {0};
-    return x;
-}
-
-fsrc_t ffloatu32(uint32_t a) {
-    (void) a;
-    fsrc_t x = {0};
-    return x;
-}
-
-fsrc_t ffloatu64(uint64_t a) {
-    (void) a;
-    fsrc_t x = {0};
-    return x;
-}
-
-void ffixbit(void *r, int32_t rprec, fsrc_t a) {
-    (void) r;
-    (void) rprec;
-    (void) a;
-}
-
-fsrc_t ffloatbit(const void *r, int32_t rprec) {
-    (void) r;
-    (void) rprec;
-    fsrc_t x = {0};
-    return x;
-}
+void __softfp_bid_pack(bool sign, uint32_t significand[], int32_t exponent, dclass_t class, void *restrict data,
+                       size_t ncomb, size_t nsig);

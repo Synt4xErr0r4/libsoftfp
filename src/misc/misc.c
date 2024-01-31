@@ -22,6 +22,7 @@
  */
 
 #include "misc.h"
+#include "../lsp.h"
 
 #include <string.h>
 
@@ -47,7 +48,7 @@ int32_t __softfp_bitscan(uint32_t *arr, size_t n, bool reverse) {
             if (!v)
                 continue;
 
-#ifdef X86 /* use `bsr` or `lzcnt` instruction */
+#if defined X86 && !defined X86_NO_LZCNT /* use `bsr` or `lzcnt` instruction */
             return _bit_scan_reverse(v) + 32 * (i - 1);
 #else
             for (size_t j = 32; j > 0; --j)
@@ -62,7 +63,7 @@ int32_t __softfp_bitscan(uint32_t *arr, size_t n, bool reverse) {
             if (!v)
                 continue;
 
-#ifdef X86 /* use `bsf` or `tzcnt` instruction */
+#if defined X86 && !defined X86_NO_TZCNT /* use `bsf` or `tzcnt` instruction */
             return _bit_scan_forward(v) + 32 * i;
 #else
             for (size_t j = 0; j < 32; ++j)
@@ -81,7 +82,7 @@ int32_t __softfp_revbitscan(uint8_t *arr, size_t n) {
         if (!v)
             continue;
 
-#ifdef X86 /* use `bsr` or `lzcnt` instruction */
+#if defined X86 && !defined X86_NO_LZCNT /* use `bsr` or `lzcnt` instruction */
         return _bit_scan_reverse(v) + 8 * (i - 1);
 #else
         for (size_t j = 8; j > 0; --j)
@@ -109,13 +110,13 @@ int __softfp_arr_shift(uint32_t *arr, size_t n, int32_t shift) {
         for (size_t i = 0; i < n; ++i) {
             size_t val = arr[i];
 
-            if (shift > 32 * (i + 1)) {
+            if ((uint32_t) shift > 32 * (i + 1)) {
                 if (!sticky)
                     sticky = !!val;
                 continue;
             }
 
-            if (shift > 32 * i) {
+            if ((uint32_t) shift > 32 * i) {
                 size_t bits = bitshift ? bitshift - 1 : 31;
 
                 round = !!(val & 1 << bits);
@@ -143,8 +144,8 @@ int __softfp_arr_shift(uint32_t *arr, size_t n, int32_t shift) {
             arr[n - i - 1] = 0;
 
         return (sticky ? BIT_STICKY : 0) | (round ? BIT_ROUND : 0) | ((arr[0] & 1) ? BIT_GUARD : 0);
-    } else {                   // shift left
-        if (shift >= 32 * n) { // shifting more bits than available
+    } else {                              // shift left
+        if ((uint32_t) shift >= 32 * n) { // shifting more bits than available
             memset(arr, 0, n * sizeof(uint32_t));
             return 0;
         }

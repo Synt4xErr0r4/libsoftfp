@@ -73,13 +73,15 @@ static inline void __set_nth_bit(uint32_t *arr, uint32_t bit, bool val) {
  * x_S = sign bit
  * x_E = exponent field
  * x_F = significand/mantissa/fraction (at least FRAC+JBIT+1 bits are allocated)
+ * x_C = classification
  */
-#define FCOMMON_DECL(x, E, F)                                                                                          \
+#define FCOMMON_DECL(x, E, J, F)                                                                                       \
     _Static_assert((E) < 31, "unsupported exponent size");                                                             \
-    _Static_assert((((E) + (F) + 1) % 8) == 0, "illegal bit count");                                                   \
+    _Static_assert((((E) + (F) + (J) + 1) % 8) == 0, "illegal bit count");                                             \
+    _Static_assert((E) + (J) + (F) + 1 <= 8 * sizeof(fsrc_t), "bit count type mismatch");                              \
     bool x##_S;                                                                                                        \
     int32_t x##_E;                                                                                                     \
-    uint32_t x##_F[BITS_TO_WORDS((F)) + (((F) % 32) ? 0 : 1)];                                                         \
+    uint32_t x##_F[BITS_TO_WORDS((F) + (J)) + ((((F) + (J)) % 32) != 0)];                                              \
     fclass_t x##_C;
 
 /* TODO not verified on big-endian systems */
@@ -94,10 +96,12 @@ static inline void __set_nth_bit(uint32_t *arr, uint32_t bit, bool val) {
         x##_S = (arr[BYTES - 1] & 0x80) == 0x80;                                                                       \
                                                                                                                        \
         memcpy(&x##_E, &arr[BYTES - E_BYTES], E_BYTES);                                                                \
+                                                                                                                       \
         x##_E >>= (F) % 8;                                                                                             \
         x##_E &= ~(UINT32_MAX << (E));                                                                                 \
                                                                                                                        \
         memcpy(x##_F, arr, BITS_TO_BYTES((F)));                                                                        \
+                                                                                                                       \
         if (F_UNUSED)                                                                                                  \
             x##_F[BITS_TO_WORDS((F)) - 1] &= ~(UINT32_MAX << F_UNUSED);                                                \
                                                                                                                        \
@@ -123,7 +127,7 @@ static inline void __set_nth_bit(uint32_t *arr, uint32_t bit, bool val) {
         } else                                                                                                         \
             memcpy(arr, x##_F + F_BYTES, E_BYTES);                                                                     \
                                                                                                                        \
-        memcpy(arr, x##_F, sizeof x##_F);                                                                              \
+        memcpy(arr, x##_F, MIN(sizeof x##_F, sizeof(f)));                                                              \
                                                                                                                        \
         if (x##_S)                                                                                                     \
             arr[BITS_TO_BYTES((B)) - 1] |= 0x80;                                                                       \

@@ -23,34 +23,53 @@
 
 #pragma once
 
+#include "../lsp.h"
+#include "common_source.h"
+
 int fcmp(fsrc_t a, fsrc_t b) {
+    (void) a;
+    (void) b;
     return 0;
 }
 
 int funord(fsrc_t a, fsrc_t b) {
+    (void) a;
+    (void) b;
     return 0;
 }
 
 int feq(fsrc_t a, fsrc_t b) {
+    (void) a;
+    (void) b;
     return 0;
 }
 
 int fne(fsrc_t a, fsrc_t b) {
+    (void) a;
+    (void) b;
     return 0;
 }
 
 int fge(fsrc_t a, fsrc_t b) {
+    (void) a;
+    (void) b;
     return 0;
 }
 
 int flt(fsrc_t a, fsrc_t b) {
+    (void) a;
+    (void) b;
     return 0;
 }
 
 int fle(fsrc_t a, fsrc_t b) {
+    (void) a;
+    (void) b;
     return 0;
 }
 
 int fgt(fsrc_t a, fsrc_t b) {
+    (void) a;
+    (void) b;
     return 0;
 }

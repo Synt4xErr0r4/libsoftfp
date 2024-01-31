@@ -23,6 +23,9 @@
 
 #pragma once
 
+#include "../lsp.h"
+#include "common_source.h"
+
 #define CMP_NAN 2
 
 static inline int cmpimpl(fsrc_t a, fsrc_t b) {

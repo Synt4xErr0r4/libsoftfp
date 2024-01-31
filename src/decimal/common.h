@@ -24,27 +24,46 @@
 #pragma once
 #include "softfp.h"
 
+#include <stdbool.h>
+#include <stdint.h>
+
+#include "../misc/misc.h"
+
 #define __X_DBUILDTYPE(B) sdecimal##B##_t
 #define __DBUILDTYPE(B) __X_DBUILDTYPE(B)
 
-typedef enum { DCLS_ZERO } dclass_t;
+typedef enum {
+    DCLS_ZERO,     // E=0 F=0
+    DCLS_DENORMAL, // E=0 F!=0
+    DCLS_NORMAL,   // E>0 E<emax
+    DCLS_INF,      // E=emax F=0
+    DCLS_SNAN,     // E=emax MSB(F)=1
+    DCLS_QNAN,     // E=emax MSB(F)=0
+} dclass_t;
+
+#define DEXP_INF INT32_MAX
+#define DEXP_NAN INT32_MIN
 
 /*
  * x_S = sign bit
  * x_E = exponent field
- * x_J = integer bit (only used for binary80)
  * x_F = significand/mantissa/fraction
+ * x_C = classification
  */
 #define DCOMMON_DECL(x, E, F)                                                                                          \
-    static_assert((E) <= 32, "unsupported exponent size");                                                             \
+    _Static_assert((E) <= 32, "unsupported exponent size");                                                            \
+    _Static_assert(((F) % 10) == 0, "unsupported significand size");                                                   \
     bool x##_S;                                                                                                        \
-    bool x##_J;                                                                                                        \
-    uint32_t x##_E;                                                                                                    \
-    uint32_t x##_F[(F) / 32];
+    int32_t x##_E;                                                                                                     \
+    uint32_t x##_F[BITS_TO_WORDS((F) + 4) + ((((F) + 4) % 32) != 0)];                                                  \
+    dclass_t x##_C;
 
-#define DCOMMON_UNPACK(x, f, E, F)                                                                                     \
+#define DCOMMON_UNPACK(x, f, E, F, DPD)                                                                                \
     do {                                                                                                               \
-                                                                                                                       \
+        if (DPD)                                                                                                       \
+            __softfp_dpd_unpack(&x##_S, x##_F, &x##_E, &x##_C, &(f), E, F);                                            \
+        else                                                                                                           \
+            __softfp_bid_unpack(&x##_S, x##_F, &x##_E, &x##_C, &(f), E, F);                                            \
     } while (0)
 
 #define DCOMMON_PACK(f, x)                                                                                             \
@@ -57,3 +76,5 @@ typedef enum { DCLS_ZERO } dclass_t;
         fsrc_t;                                                                                                        \
         FPACK(f                                                                                                        \
     } while (0)
+
+#include "packing.h"

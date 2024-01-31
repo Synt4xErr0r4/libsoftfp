@@ -146,7 +146,7 @@ whereas `cmul` and `cdiv` take the complex numbers themselves as their parameter
   - [x] arithmetic (`add`, `sub`, `mul`, `div`, `neg`)
   - [x] integer conversions (`fix`, `float`)
   - [x] comparisons (`cmp`, `unord`, `eq`, ...)
-  - [ ] complex arithmetic (`mul`, `div`, `cmul`, `cdiv`)
+  - [x] complex arithmetic (`mul`, `div`, `cmul`, `cdiv`)
 - decimal
   - [ ] arithmetic
   - [ ] integer conversions

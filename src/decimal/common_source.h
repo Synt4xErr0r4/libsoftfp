@@ -26,6 +26,10 @@
 
 #define fsrc_t __DBUILDTYPE(FBITS)
 
+#define DDECL(x) DCOMMON_DECL(x, FCOMB, FSIGN)
+
+#define DUNPACK(x, a) DCOMMON_UNPACK(x, a, FCOMB, FSIGN, FDPD)
+
 #if FCAST_ONLY == 0
 #include "arithmetic.h"
 #include "compare.h"

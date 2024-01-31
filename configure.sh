@@ -10,7 +10,7 @@ make_complex_type() {
     if [[ "$1" == "float" ]] || [[ "$1" == "double" ]] || [[ "$1" == "long double" ]]; then
         echo "_Complex $1"
     else
-        printf "struct { %s Re; %s Im; }" "$1" "$1"
+        printf "struct { sbinary%s_t Re; sbinary%s_t Im; }" "$2" "$2"
     fi
 }
 
@@ -65,12 +65,12 @@ TYPE_DEC32=`make_struct_type 32`
 TYPE_DEC64=`make_struct_type 64`
 TYPE_DEC128=`make_struct_type 128`
 
-CTYPE_BIN16=`make_complex_type "$TYPE_BIN16"`
-CTYPE_BIN32=`make_complex_type "$TYPE_BIN32"`
-CTYPE_BIN64=`make_complex_type "$TYPE_BIN64"`
-CTYPE_BIN80=`make_complex_type "$TYPE_BIN80"`
-CTYPE_BIN128=`make_complex_type "$TYPE_BIN128"`
-CTYPE_BIN256=`make_complex_type "$TYPE_BIN256"`
+CTYPE_BIN16=`make_complex_type "$TYPE_BIN16" 16`
+CTYPE_BIN32=`make_complex_type "$TYPE_BIN32" 32`
+CTYPE_BIN64=`make_complex_type "$TYPE_BIN64" 64`
+CTYPE_BIN80=`make_complex_type "$TYPE_BIN80" 80`
+CTYPE_BIN128=`make_complex_type "$TYPE_BIN128" 128`
+CTYPE_BIN256=`make_complex_type "$TYPE_BIN256" 256`
 
 _prnt_msg() {
     name=$1
@@ -320,27 +320,27 @@ while [[ $# -gt 0 ]]; do
         ;;
     --preset-bin16*)
         TYPE_BIN16=`parse_preset "$1" 0 16`
-        CTYPE_BIN16=`make_complex_type "$TYPE_BIN16"`
+        CTYPE_BIN16=`make_complex_type "$TYPE_BIN16" 16`
         ;;
     --preset-bin32*)
         TYPE_BIN32=`parse_preset "$1" 0 32`
-        CTYPE_BIN32=`make_complex_type "$TYPE_BIN32"`
+        CTYPE_BIN32=`make_complex_type "$TYPE_BIN32" 32`
         ;;
     --preset-bin64*)
         TYPE_BIN64=`parse_preset "$1" 0 64`
-        CTYPE_BIN64=`make_complex_type "$TYPE_BIN64"`
+        CTYPE_BIN64=`make_complex_type "$TYPE_BIN64" 64`
         ;;
     --preset-bin80*)
         TYPE_BIN80=`parse_preset "$1" 0 $BIN80_SIZE`
-        CTYPE_BIN80=`make_complex_type "$TYPE_BIN80"`
+        CTYPE_BIN80=`make_complex_type "$TYPE_BIN80" 80`
         ;;
     --preset-bin128*)
         TYPE_BIN128=`parse_preset "$1" 0 128`
-        CTYPE_BIN128=`make_complex_type "$TYPE_BIN128"`
+        CTYPE_BIN128=`make_complex_type "$TYPE_BIN128" 128`
         ;;
     --preset-bin256*)
         TYPE_BIN256=`parse_preset "$1" 0 256`
-        CTYPE_BIN256=`make_complex_type "$TYPE_BIN256"`
+        CTYPE_BIN256=`make_complex_type "$TYPE_BIN256" 256`
         ;;
     --preset-dec32*)
         TYPE_DEC32=`parse_preset "$1" 1 32`

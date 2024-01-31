@@ -55,7 +55,7 @@ int __softfp_fegetexceptflag(fexcept_t *flagp, int excepts) {
 }
 
 int __softfp_fesetexceptflag(const fexcept_t *flagp, int excepts) {
-    fenv |= (excepts & FE_ALL_EXCEPT) << EXCEPTION_OFFSET;
+    fenv |= (*flagp & excepts & FE_ALL_EXCEPT) << EXCEPTION_OFFSET;
     return 0;
 }
 

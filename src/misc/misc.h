@@ -23,9 +23,19 @@
 
 #pragma once
 
+#include "../lsp.h"
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
+
+#ifndef FE_DENORM
+#ifdef __FE_DENORM
+#define FE_DENORM __FE_DENORM
+#else
+#define FE_DENORM 0
+#endif
+#endif
 
 #if defined(__x86_64__) || defined(_M_X64) || defined(i386) || defined(__i386__) || defined(__i386) || defined(_M_IX86)
 #define X86 1

@@ -12,7 +12,7 @@ include(GNUInstallDirs)
 
 add_library(softfp SHARED ${sources})
 
-target_compile_options(softfp PRIVATE -Wno-builtin-declaration-mismatch)
+target_compile_options(softfp PRIVATE -mbmi2 -O0 -fPIC -Wall -Wextra -Wpedantic -Wno-unknown-pragmas -Wno-unused-label -Wno-builtin-declaration-mismatch -gdwarf-4)
 
 set_target_properties(softfp PROPERTIES
     VERSION ${PROJECT_VERSION}

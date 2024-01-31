@@ -1,4 +1,14 @@
+/*
+ * Source: https://github.com/Clownacy/asl-releases/blob/master/math64.c
+ * with slight modifications
+ *
+ * License: GPL-2.0
+ * https://github.com/Clownacy/asl-releases/blob/master/COPYING
+ *
+ */
 #include <stdint.h>
+
+#include "divmnu.h"
 
 static int nlz16(uint16_t n) {
     unsigned z;
@@ -10,7 +20,7 @@ static int nlz16(uint16_t n) {
     return z;
 }
 
-static int divmnu(uint16_t q[], uint16_t r[], const uint16_t u[], const uint16_t v[], int m, int n) {
+int __softfp_divmnu(uint16_t q[], uint16_t r[], const uint16_t u[], const uint16_t v[], int m, int n) {
     const unsigned b = 65536;
     uint16_t un[16], vn[16];
     unsigned qhat;

@@ -23,7 +23,11 @@
 
 #pragma once
 
+#include "../lsp.h"
+#include "../misc/arith.h"
+#include "../misc/divmnu.h"
 #include "../misc/misc.h"
+#include "common_source.h"
 #include <stdio.h>
 
 #define NWORDS (sizeof z_F / sizeof *z_F)
@@ -36,35 +40,13 @@
                 feraiseexcept(FE_INVALID);                                                                             \
             case FCLS_QNAN:                                                                                            \
                 FRETURN(x);                                                                                            \
+            default:                                                                                                   \
+                break;                                                                                                 \
         }                                                                                                              \
                                                                                                                        \
         if (x##_C == FCLS_DENORMAL)                                                                                    \
             feraiseexcept(FE_DENORM);                                                                                  \
     } while (0)
-
-static inline uint32_t addcarry(uint32_t a, uint32_t b, uint8_t *carry) {
-    uint32_t c;
-#ifdef X86
-    *carry = _addcarry_u32(*carry, a, b, &c);
-#else
-    c = a + b + *carry;
-
-    *carry = (c <= a && c <= b) ? 1 : 0; // overflow check
-#endif
-    return c;
-}
-
-static inline uint32_t subborrow(uint32_t a, uint32_t b, uint8_t *carry) {
-    uint32_t c;
-#ifdef X86
-    *carry = _subborrow_u32(*carry, a, b, &c);
-#else
-    c = a - b - *carry;
-
-    *carry = ((b == UINT32_MAX && *carry) || b + *carry > a) ? 1 : 0; // overflow check
-#endif
-    return c;
-}
 
 static inline fsrc_t faddsub(fsrc_t a, fsrc_t b, bool sub) {
     FDECL(x);
@@ -93,8 +75,6 @@ static inline fsrc_t faddsub(fsrc_t a, fsrc_t b, bool sub) {
         goto done;
     }
 
-    printf("%d/%d x=%d, y=%d, %d\n", x_E, FSPECIALEXP(FEXP), x_C, y_C, FCLS_INF);
-
     if (x_C == FCLS_INF || y_C == FCLS_ZERO)
         FRETURN(x);
 
@@ -105,28 +85,9 @@ static inline fsrc_t faddsub(fsrc_t a, fsrc_t b, bool sub) {
 
     int round = x_E == z_E ? ARRAY_RSHIFT(y_F, z_E - y_E) : ARRAY_RSHIFT(x_F, z_E - x_E);
 
-    uint8_t carry = 0;
+    uint8_t carry = addsub(z_F, x_F, y_F, sizeof x_F / sizeof *x_F, x_S != y_S);
 
-    if (x_S == y_S) {
-        for (size_t i = 0; i < sizeof x_F / sizeof *x_F; ++i)
-            z_F[i] = addcarry(x_F[i], y_F[i], &carry);
-
-        z_S = x_S;
-    } else {
-        for (size_t i = 0; i < sizeof x_F / sizeof *x_F; ++i)
-            z_F[i] = subborrow(x_F[i], y_F[i], &carry);
-
-        if (carry) {
-            z_S = !x_S;
-
-            carry = 1;
-
-            // negate z_F (two's complement)
-            for (size_t i = 0; i < sizeof z_F / sizeof *z_F; ++i)
-                z_F[i] = ~subborrow(z_F[i], 0, &carry);
-        } else
-            z_S = x_S;
-    }
+    z_S = x_S ^ carry;
 
     FROUND_AND_NORMALIZE(z, round);
 done:
@@ -179,15 +140,7 @@ fsrc_t fmul(fsrc_t a, fsrc_t b) {
 
     memcpy(mult, x_F, sizeof x_F);
 
-    for (size_t i = 0; i < (32 * NWORDS); ++i, ++shift)
-        if (FCOMMON_GET_NTH(y, i)) {
-            ARRAY_LSHIFT(mult, shift);
-            carry = 0;
-            shift = 0;
-
-            for (size_t j = 0; j < NWORDS * 2; ++j)
-                prod[j] = addcarry(prod[j], mult[j], &carry);
-        }
+    __softfp_mul(prod, mult, y_F, NWORDS);
 
     int round = ARRAY_RSHIFT(prod, FFRAC);
 
@@ -197,8 +150,6 @@ fsrc_t fmul(fsrc_t a, fsrc_t b) {
 done:
     FRETURN(z);
 }
-
-#include "divmnu.h"
 
 fsrc_t fdiv(fsrc_t a, fsrc_t b) {
     FDECL(x);
@@ -243,8 +194,7 @@ fsrc_t fdiv(fsrc_t a, fsrc_t b) {
 
     memcpy(&dividend[NWORDS], x_F, sizeof x_F);
 
-    divmnu((uint16_t *) quotient, (uint16_t *) rem, (uint16_t *) dividend, (uint16_t *) y_F, NWORDS * 4,
-           BITS_TO_WORDS(2 * ARRAY_MSB(y_F)));
+    divmnu(quotient, rem, dividend, y_F, NWORDS * 4, BITS_TO_WORDS(2 * ARRAY_MSB(y_F)));
 
     int round = ARRAY_RSHIFT(quotient, NWORDS * 32 - FFRAC);
 

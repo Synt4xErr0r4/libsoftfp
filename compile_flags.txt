@@ -1,1 +1,3 @@
 -Iinclude
+-D__SOFTFP_LSP
+-std=c2x

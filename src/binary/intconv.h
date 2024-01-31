@@ -23,6 +23,9 @@
 
 #pragma once
 
+#include "../lsp.h"
+#include "common_source.h"
+
 // TODO these functions are a bit janky, maybe rewrite them
 // TODO check FPEs
 
@@ -66,7 +69,7 @@
         BASE_CONV2INT(nanval, sizeof(type) * 8, unsigned_);                                                            \
                                                                                                                        \
         type ret = 0;                                                                                                  \
-        memcpy(&ret, x_F, sizeof ret);                                                                                 \
+        memcpy(&ret, x_F, MIN(sizeof ret, sizeof x_F));                                                                \
                                                                                                                        \
         if (!unsigned_ && (ret > 0) == x_S)                                                                            \
             ret = -ret;                                                                                                \
@@ -117,10 +120,19 @@ uint64_t ffixu64(fsrc_t a) {
             goto done;                                                                                                 \
         }                                                                                                              \
                                                                                                                        \
-        memset(z_F, 0, sizeof z_F);                                                                                    \
-        memcpy(z_F, (value), (nbytes));                                                                                \
+        int round;                                                                                                     \
                                                                                                                        \
-        int round = ARRAY_LSHIFT(z_F, FFRAC - msb);                                                                    \
+        if (sizeof z_F < (nbytes)) {                                                                                   \
+            uint32_t buffer[(nbytes)];                                                                                 \
+            memcpy(buffer, (value), (nbytes));                                                                         \
+            round = ARRAY_LSHIFT(buffer, FFRAC - msb);                                                                 \
+            memcpy(z_F, buffer, sizeof z_F);                                                                           \
+        } else {                                                                                                       \
+            memset(z_F, 0, sizeof z_F);                                                                                \
+            memcpy(z_F, (value), (nbytes));                                                                            \
+            round = ARRAY_LSHIFT(z_F, FFRAC - msb);                                                                    \
+        }                                                                                                              \
+                                                                                                                       \
         bool truncated = SHOULD_ROUND(z_S, round);                                                                     \
                                                                                                                        \
         if (truncated)                                                                                                 \

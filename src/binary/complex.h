@@ -23,6 +23,9 @@
 
 #pragma once
 
+#include "../lsp.h"
+#include "common_source.h"
+
 #if FSTDCOMPLEX == 1
 #include <complex.h>
 
@@ -225,7 +228,7 @@ fcomplex_t fdivc(fsrc_t a, fsrc_t b, fsrc_t c, fsrc_t d) {
     FPACK(fc, c);
     FPACK(fd, d);
 
-nonfinite:
+nonfinite:;
     fsrc_t ac = fmul(a, c);
     fsrc_t bd = fmul(b, d);
     fsrc_t ad = fmul(a, d);
