@@ -1,5 +1,5 @@
 #!/bin/bash
-# (c) 2023, Thomas Kasper
+# (c) 2024, Thomas Kasper
 # Licensed under the MIT License. See `LICENSE` for more information
 
 make_struct_type() {
@@ -396,7 +396,7 @@ while [[ $# -gt 0 ]]; do
 
         # print usage
         echo -e "${BL}libsoftfp$RS version 0.1.0"
-        echo -e "(c) 2023, Thomas Kasper"
+        echo -e "(c) 2024, Thomas Kasper"
         echo
 
         BIN_TYPES="bin{${GR}16,${GR}32,${GR}64,${GR}80,${GR}128,${GR}256}"

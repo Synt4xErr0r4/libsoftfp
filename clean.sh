@@ -1,5 +1,5 @@
 #!/bin/bash
-# (c) 2023, Thomas Kasper
+# (c) 2024, Thomas Kasper
 # Licensed under the MIT License. See `LICENSE` for more information
 
 rm -rf build
